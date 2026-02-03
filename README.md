@@ -434,6 +434,13 @@ templates/cotton/
     └── card.html
 ```
 
+```html
+<!-- Usage -->
+<c-layout.page>...</c-layout.page>
+<c-form.input placeholder="Name" />
+<c-ui.alert>Success!</c-ui.alert>
+```
+
 ### Dynamic Components
 
 Sometimes there is a need to include a component dynamically, for example, you are looping through some data and the type of component is defined within a variable.
