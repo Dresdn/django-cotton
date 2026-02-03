@@ -423,9 +423,9 @@ Use dot notation in component names to organize components in subfolders. This k
 
 ```
 templates/cotton/
-├── layout/
+├── card/
 │   ├── index.html
-│   └── page.html
+│   └── header.html
 ├── form/
 │   ├── input.html
 │   └── button.html
@@ -436,7 +436,9 @@ templates/cotton/
 
 ```html
 <!-- Usage -->
-<c-layout.page>...</c-layout.page>
+<c-card>
+  <c-card.header>...</c-card.header>
+</c-card>
 <c-form.input placeholder="Name" />
 <c-ui.alert>Success!</c-ui.alert>
 ```
