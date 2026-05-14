@@ -83,20 +83,28 @@ jobs:
           COMMENT='${{ github.event.comment.body }}'
 
           SEND="false"
+          ACTOR="${{ github.actor }}"
 
-          # Always send if issue has claude label
-          if echo "$LABELS" | grep -q '"claude"'; then
-            SEND="true"
-          fi
-
-          # Always send if comment mentions @claude
-          if echo "$COMMENT" | grep -qi '@claude'; then
-            SEND="true"
-          fi
-
-          # Send PR events (always relevant)
-          if [ "$EVENT" = "pull_request" ] || [ "$EVENT" = "pull_request_review" ]; then
-            SEND="true"
+          # Skip notifications for Will's own actions
+          if [ "$ACTOR" = "wrabit" ]; then
+            # Only notify Will about his own actions if @claude is mentioned
+            if echo "$COMMENT" | grep -qi '@claude'; then
+              SEND="true"
+            fi
+          else
+            # For non-Will actors (Claude bot, collaborators):
+            # Send if issue has claude label
+            if echo "$LABELS" | grep -q '"claude"'; then
+              SEND="true"
+            fi
+            # Send PR events
+            if [ "$EVENT" = "pull_request" ] || [ "$EVENT" = "pull_request_review" ]; then
+              SEND="true"
+            fi
+            # Send if @claude mentioned
+            if echo "$COMMENT" | grep -qi '@claude'; then
+              SEND="true"
+            fi
           fi
 
           echo "send=$SEND" >> $GITHUB_OUTPUT
