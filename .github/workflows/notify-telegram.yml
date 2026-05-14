@@ -75,8 +75,34 @@ jobs:
           MSG="${MSG}\n${URL}"
           echo "msg=${MSG}" >> $GITHUB_OUTPUT
 
+      - name: Check if Claude-relevant
+        id: check
+        run: |
+          EVENT="${{ github.event_name }}"
+          LABELS='${{ toJSON(github.event.issue.labels.*.name) }}'
+          COMMENT='${{ github.event.comment.body }}'
+
+          SEND="false"
+
+          # Always send if issue has claude label
+          if echo "$LABELS" | grep -q '"claude"'; then
+            SEND="true"
+          fi
+
+          # Always send if comment mentions @claude
+          if echo "$COMMENT" | grep -qi '@claude'; then
+            SEND="true"
+          fi
+
+          # Send PR events (always relevant)
+          if [ "$EVENT" = "pull_request" ] || [ "$EVENT" = "pull_request_review" ]; then
+            SEND="true"
+          fi
+
+          echo "send=$SEND" >> $GITHUB_OUTPUT
+
       - name: Send to Telegram
-        if: steps.message.outputs.msg != ''
+        if: steps.check.outputs.send == 'true' && steps.message.outputs.msg != ''
         run: |
           curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
             -H "Content-Type: application/json" \
